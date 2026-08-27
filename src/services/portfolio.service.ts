@@ -106,7 +106,8 @@ export class PortfolioService implements OnModuleInit {
                     category: "fullstack",
                     tech: ["React.js", "Node.js", "Express", "MongoDB", "Tailwind CSS", "Redis"],
                     github: "https://github.com",
-                    live: "https://example.com"
+                    live: "https://example.com",
+                    imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80"
                 },
                 {
                     title: "TaskPulse - API Điều phối Tác vụ Hệ thống",
@@ -114,7 +115,8 @@ export class PortfolioService implements OnModuleInit {
                     category: "backend",
                     tech: ["Laravel", "PHP", "PostgreSQL", "Redis", "Docker"],
                     github: "https://github.com",
-                    live: "https://example.com"
+                    live: "https://example.com",
+                    imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
                 },
                 {
                     title: "RestroPay - Cổng Thanh toán Đăng ký Stripe",
@@ -122,7 +124,8 @@ export class PortfolioService implements OnModuleInit {
                     category: "backend",
                     tech: ["Node.js", "TypeScript", "Express", "Stripe API", "PostgreSQL", "Prisma"],
                     github: "https://github.com",
-                    live: "https://example.com"
+                    live: "https://example.com",
+                    imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1d704d3?auto=format&fit=crop&w=800&q=80"
                 }
             ];
             await this.projectRepo.save(defaultProjects);
