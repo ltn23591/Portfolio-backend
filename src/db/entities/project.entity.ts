@@ -23,6 +23,6 @@ export class ProjectEntity {
     @Column({ nullable: true })
     live: string;
 
-    @Column({ nullable: true, default: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80' })
-    imageUrl: string;
+    @Column({ type: 'simple-array', nullable: true })
+    images: string[];
 }

@@ -4,7 +4,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import * as fs from 'fs';
 
-@Controller('api/upload')
+@Controller('upload')
 export class UploadController {
   constructor() {
     // Ensure uploads directory exists
