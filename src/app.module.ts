@@ -15,6 +15,8 @@ import { ExperienceEntity } from './db/entities/experience.entity';
 import { TestimonialEntity } from './db/entities/testimonial.entity';
 import { SettingsEntity } from './db/entities/settings.entity';
 
+import { UploadController } from './controllers/upload.controller';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,7 +46,7 @@ import { SettingsEntity } from './db/entities/settings.entity';
       ProjectEntity, ExperienceEntity, TestimonialEntity, SettingsEntity
     ]),
   ],
-  controllers: [ContactController, PortfolioController],
+  controllers: [ContactController, PortfolioController, UploadController],
   providers: [ContactService, PortfolioService],
 })
 export class AppModule {}
