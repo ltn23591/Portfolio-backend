@@ -16,6 +16,7 @@ import { TestimonialEntity } from './db/entities/testimonial.entity';
 import { SettingsEntity } from './db/entities/settings.entity';
 
 import { UploadController } from './controllers/upload.controller';
+import { CloudinaryProvider } from './config/cloudinary.config';
 
 @Module({
   imports: [
@@ -47,6 +48,6 @@ import { UploadController } from './controllers/upload.controller';
     ]),
   ],
   controllers: [ContactController, PortfolioController, UploadController],
-  providers: [ContactService, PortfolioService],
+  providers: [ContactService, PortfolioService, CloudinaryProvider],
 })
 export class AppModule {}
