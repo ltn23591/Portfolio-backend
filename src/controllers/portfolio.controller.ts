@@ -1,12 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { PortfolioService } from '../services/portfolio.service';
-import { HeroEntity } from '../db/entities/hero.entity';
-import { AboutEntity } from '../db/entities/about.entity';
-import { SkillEntity } from '../db/entities/skill.entity';
-import { ProjectEntity } from '../db/entities/project.entity';
-import { ExperienceEntity } from '../db/entities/experience.entity';
-import { TestimonialEntity } from '../db/entities/testimonial.entity';
-import { SettingsEntity } from '../db/entities/settings.entity';
+import { Hero, About, Skill, Project, Experience, Testimonial, Settings, Library } from '@prisma/client';
 
 @Controller('portfolio')
 export class PortfolioController {
@@ -18,8 +12,13 @@ export class PortfolioController {
         return this.portfolioService.getSettings();
     }
 
+    @Get('github-contributions/:username')
+    async getGithubContributions(@Param('username') username: string) {
+        return this.portfolioService.getGithubContributions(username);
+    }
+
     @Post('settings/:id')
-    async updateSettings(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<SettingsEntity>) {
+    async updateSettings(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<Settings>) {
         return this.portfolioService.updateSettings(id, data);
     }
 
@@ -30,7 +29,7 @@ export class PortfolioController {
     }
 
     @Post('hero/:id')
-    async updateHero(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<HeroEntity>) {
+    async updateHero(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<Hero>) {
         return this.portfolioService.updateHero(id, data);
     }
 
@@ -41,7 +40,7 @@ export class PortfolioController {
     }
 
     @Post('about/:id')
-    async updateAbout(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<AboutEntity>) {
+    async updateAbout(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<About>) {
         return this.portfolioService.updateAbout(id, data);
     }
 
@@ -52,7 +51,7 @@ export class PortfolioController {
     }
 
     @Post('skills')
-    async saveSkill(@Body() data: Partial<SkillEntity>) {
+    async saveSkill(@Body() data: Partial<Skill>) {
         return this.portfolioService.saveSkill(data);
     }
 
@@ -68,7 +67,7 @@ export class PortfolioController {
     }
 
     @Post('projects')
-    async saveProject(@Body() data: Partial<ProjectEntity>) {
+    async saveProject(@Body() data: Partial<Project>) {
         return this.portfolioService.saveProject(data);
     }
 
@@ -84,7 +83,7 @@ export class PortfolioController {
     }
 
     @Post('experience')
-    async saveExperience(@Body() data: Partial<ExperienceEntity>) {
+    async saveExperience(@Body() data: Partial<Experience>) {
         return this.portfolioService.saveExperience(data);
     }
 
@@ -100,12 +99,49 @@ export class PortfolioController {
     }
 
     @Post('testimonials')
-    async saveTestimonial(@Body() data: Partial<TestimonialEntity>) {
+    async saveTestimonial(@Body() data: Partial<Testimonial>) {
         return this.portfolioService.saveTestimonial(data);
     }
 
     @Delete('testimonials/:id')
     async deleteTestimonial(@Param('id', ParseIntPipe) id: number) {
         return this.portfolioService.deleteTestimonial(id);
+    }
+
+    // Libraries CRUD
+    @Get('libraries')
+    async getLibraries() {
+        return this.portfolioService.getLibraries();
+    }
+
+    @Post('libraries/generate-ai')
+    async generateAI(@Body() body: { name: string; category: string }) {
+        return this.portfolioService.generateLibraryAI(body.name, body.category);
+    }
+
+    @Post('libraries')
+    async saveLibrary(@Body() data: Partial<Library>) {
+        return this.portfolioService.saveLibrary(data);
+    }
+
+    @Delete('libraries/:id')
+    async deleteLibrary(@Param('id', ParseIntPipe) id: number) {
+        return this.portfolioService.deleteLibrary(id);
+    }
+
+    // Extensions Endpoints
+    @Get('extensions')
+    async getExtensions() {
+        return this.portfolioService.getExtensions();
+    }
+
+    @Post('extensions')
+    async saveExtension(@Body() data: any) {
+        return this.portfolioService.saveExtension(data);
+    }
+
+    @Delete('extensions/:id')
+    async deleteExtension(@Param('id', ParseIntPipe) id: number) {
+        return this.portfolioService.deleteExtension(id);
     }
 }

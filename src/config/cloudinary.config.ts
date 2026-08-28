@@ -40,10 +40,10 @@ export const CloudinaryProvider = {
 
     try {
       // Perform connection ping test to validate credentials
-      await cloudinary.api.ping();
-      console.log('✅ Cloudinary connection check: SUCCESS!');
+      const result = await cloudinary.api.ping();
+      console.log('✅ Cloudinary connection check: SUCCESS!', result);
     } catch (err) {
-      console.error('❌ Cloudinary connection check: FAILED! Error:', err.message);
+      console.error('❌ Cloudinary connection check: FAILED! Error details:', JSON.stringify(err, null, 2) || err);
     }
 
     return cloudinary;

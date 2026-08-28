@@ -1,23 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateContactDto } from '../types/contact.dto';
-import { Contact } from '../db/entities/contact.entity';
+import { PrismaService } from '../db/prisma.service';
+import { PortfolioGateway } from '../gateways/portfolio.gateway';
 
 @Injectable()
 export class ContactService {
     private readonly logger = new Logger(ContactService.name);
 
     constructor(
-        @InjectRepository(Contact)
-        private readonly contactRepository: Repository<Contact>
+        private readonly prisma: PrismaService,
+        private readonly portfolioGateway: PortfolioGateway
     ) {}
 
     async handleContactMessage(createContactDto: CreateContactDto) {
         this.logger.log(`Saving contact message received from: ${createContactDto.name} <${createContactDto.email}>`);
         
-        const newContact = this.contactRepository.create(createContactDto);
-        const savedContact = await this.contactRepository.save(newContact);
+        const savedContact = await this.prisma.contact.create({
+            data: createContactDto
+        });
+
+        // Broadcast realtime notification via WebSocket
+        this.portfolioGateway.broadcastNewMessage(savedContact);
 
         return {
             success: true,
@@ -27,6 +30,6 @@ export class ContactService {
     }
 
     async getAllMessages() {
-        return this.contactRepository.find();
+        return this.prisma.contact.findMany();
     }
 }

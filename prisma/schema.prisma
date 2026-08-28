@@ -1,0 +1,147 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Settings {
+  id             Int      @id @default(autoincrement())
+  logoText       String   @default("Nghĩa.dev") @map("logoText")
+  footerText     String   @default("© 2026 Lê Trung Nghĩa. All rights reserved.") @map("footerText")
+  resumeUrl      String?  @default("#") @map("resumeUrl")
+  showHero       Boolean  @default(true) @map("showHero")
+  showAbout      Boolean  @default(true) @map("showAbout")
+  showProjects   Boolean  @default(true) @map("showProjects")
+  showExperience Boolean  @default(true) @map("showExperience")
+  showTestimonials Boolean @default(true) @map("showTestimonials")
+  showContact    Boolean  @default(true) @map("showContact")
+  themeMode      String   @default("obsidian-teal") @map("themeMode")
+  contactEmail   String   @default("letrungnghia.dev@gmail.com") @map("contactEmail")
+  contactPhone   String   @default("+84 987 654 321") @map("contactPhone")
+  contactAddress String   @default("TP. Hồ Chí Minh, Việt Nam") @map("contactAddress")
+  githubUrl      String   @default("https://github.com/ltn23591") @map("githubUrl")
+  linkedinUrl    String   @default("https://linkedin.com") @map("linkedinUrl")
+  telegramUrl    String   @default("https://t.me/example") @map("telegramUrl")
+
+  @@map("portfolio_settings")
+}
+
+model Hero {
+  id          Int     @id @default(autoincrement())
+  tagline     String  @default("Software Engineer")
+  title       String
+  description String
+  githubUrl   String?
+  linkedinUrl String?
+  emailUrl    String?
+
+  @@map("portfolio_hero")
+}
+
+model About {
+  id               Int     @id @default(autoincrement())
+  title            String  @default("Who is Le Trung Nghia?")
+  bio1             String
+  bio2             String?
+  philosophy       String?
+  statExp          String  @default("4+")
+  statProjects     String  @default("35+")
+  statSatisfaction String  @default("99%")
+  statOpenSource   String  @default("15+")
+
+  @@map("portfolio_about")
+}
+
+model Skill {
+  id        Int    @id @default(autoincrement())
+  category  String
+  skillName String
+
+  @@map("portfolio_skills")
+}
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String
+  category    String
+  tech        String[]
+  github      String?
+  live        String?
+  images      String[]
+  repos       ProjectRepo[]
+
+  @@map("portfolio_projects")
+}
+
+model ProjectRepo {
+  id        Int     @id @default(autoincrement())
+  label     String
+  url       String
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_project_repos")
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+  role        String
+  company     String
+  period      String
+  description String[]
+  skills      String[]
+
+  @@map("portfolio_experiences")
+}
+
+model Testimonial {
+  id        Int     @id @default(autoincrement())
+  name      String
+  role      String
+  content   String
+  rating    Int     @default(5)
+  avatarUrl String?
+
+  @@map("portfolio_testimonials")
+}
+
+model Library {
+  id       Int     @id @default(autoincrement())
+  name     String
+  filename String
+  language String
+  category String
+  desc     String
+  install  String?
+  codeTs   String?
+  codeJs   String?
+
+  @@map("portfolio_libraries")
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  timestamp DateTime @default(now()) @map("timestamp")
+
+  @@map("contacts")
+}
+
+model Extension {
+  id          Int      @id @default(autoincrement())
+  name        String
+  extensionId String   @unique
+  desc        String
+  category    String
+  installUrl  String?
+  iconUrl     String?
+
+  @@map("portfolio_extensions")
+}
