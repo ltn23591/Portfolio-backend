@@ -34,6 +34,7 @@ model Hero {
   tagline     String  @default("Software Engineer")
   title       String
   description String
+  avatarUrl   String? @default("")
   githubUrl   String?
   linkedinUrl String?
   emailUrl    String?
@@ -67,6 +68,8 @@ model Project {
   id          Int           @id @default(autoincrement())
   title       String
   description String
+  isBest      Boolean       @default(false)
+  highlights  String[]      @default([])
   category    String
   tech        String[]
   github      String?
@@ -88,12 +91,13 @@ model ProjectRepo {
 }
 
 model Experience {
-  id          Int      @id @default(autoincrement())
-  role        String
-  company     String
-  period      String
-  description String[]
-  skills      String[]
+  id           Int      @id @default(autoincrement())
+  role         String
+  company      String
+  period       String
+  achievements String[] @default([])
+  description  String[]
+  skills       String[]
 
   @@map("portfolio_experiences")
 }

@@ -1,489 +1,512 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
-import { defaultLibraries } from '../db/seeds/libraries.seed';
 
 @Injectable()
 export class PortfolioService implements OnModuleInit {
-    constructor(
-        private readonly prisma: PrismaService
-    ) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-    // Auto seed database if empty
-    async onModuleInit() {
-        // Seed Settings
-        const settingsCount = await this.prisma.settings.count();
-        if (settingsCount === 0) {
-            await this.prisma.settings.create({
-                data: {
-                    logoText: "Nghĩa.dev",
-                    footerText: "© 2026 Lê Trung Nghĩa. Bảo lưu mọi quyền.",
-                    resumeUrl: "#",
-                    showHero: true,
-                    showAbout: true,
-                    showProjects: true,
-                    showExperience: true,
-                    showTestimonials: true,
-                    showContact: true,
-                    themeMode: "obsidian-teal",
-                    contactEmail: "letrungnghia.dev@gmail.com",
-                    contactPhone: "+84 987 654 321",
-                    contactAddress: "TP. Hồ Chí Minh, Việt Nam",
-                    githubUrl: "https://github.com/ltn23591",
-                    linkedinUrl: "https://linkedin.com",
-                    telegramUrl: "https://t.me/example"
-                }
+    onModuleInit() {
+        void this.seedDefaultsIfNeeded();
+    }
+
+    private async seedDefaultsIfNeeded() {
+        try {
+            // 1. Settings
+            const existingSettings = await this.prisma.settings.findFirst({
+                orderBy: { id: 'asc' },
             });
-        }
-
-        // Seed Hero
-        const heroCount = await this.prisma.hero.count();
-        if (heroCount === 0) {
-            await this.prisma.hero.create({
-                data: {
-                    tagline: "Kỹ sư Phần mềm & Chuyên gia Backend",
-                    title: "Xây dựng giải pháp hệ thống hiệu năng cao",
-                    description: "Xin chào, tôi là Lê Trung Nghĩa. Tôi chuyên thiết kế kiến trúc hệ thống backend chịu tải lớn, xây dựng API tối ưu và phát triển các sản phẩm fullstack hiện đại bằng React, Node.js, Laravel và TypeScript.",
-                    githubUrl: "https://github.com/ltn23591",
-                    linkedinUrl: "https://linkedin.com",
-                    emailUrl: "mailto:letrungnghia.dev@gmail.com"
-                }
-            });
-        }
-
-        // Seed About
-        const aboutCount = await this.prisma.about.count();
-        if (aboutCount === 0) {
-            await this.prisma.about.create({
-                data: {
-                    title: "Kỹ Sư Backend NestJS & Node.js",
-                    bio1: "Tôi là một nhà phát triển phần mềm chuyên nghiệp tập trung vào việc lập trình các ứng dụng web tối ưu và xây dựng hệ thống microservices backend có độ tin cậy cao.",
-                    bio2: "Tôi luôn tìm kiếm các giải pháp tự động hóa thông minh, thiết kế CSDL chuẩn hóa tối đa và tối ưu hóa tốc độ phản hồi API.",
-                    philosophy: "Hệ thống tốt là hệ thống chạy ổn định và dễ bảo trì.",
-                    statExp: "4+",
-                    statProjects: "35+",
-                    statSatisfaction: "99%",
-                    statOpenSource: "15+"
-                }
-            });
-        }
-
-        // Force re-seed skills to Neon database
-        await this.prisma.skill.deleteMany();
-        const defaultSkills = [
-            { category: 'Hệ thống Backend', skillName: 'Node.js' },
-            { category: 'Hệ thống Backend', skillName: 'Express' },
-            { category: 'Hệ thống Backend', skillName: 'NestJS' },
-            { category: 'Hệ thống Backend', skillName: 'Laravel (PHP)' },
-            { category: 'Hệ thống Backend', skillName: 'TypeScript' },
-            { category: 'Tích hợp Frontend', skillName: 'React.js' },
-            { category: 'Tích hợp Frontend', skillName: 'Tailwind CSS' },
-            { category: 'Tích hợp Frontend', skillName: 'Next.js' },
-            { category: 'Cơ sở dữ liệu & Caching', skillName: 'PostgreSQL' },
-            { category: 'Cơ sở dữ liệu & Caching', skillName: 'MongoDB' },
-            { category: 'Cơ sở dữ liệu & Caching', skillName: 'Redis' },
-            { category: 'DevOps & Công cụ', skillName: 'Docker' },
-            { category: 'DevOps & Công cụ', skillName: 'Git/GitHub' },
-            { category: 'DevOps & Công cụ', skillName: 'AWS' }
-        ];
-        await this.prisma.skill.createMany({ data: defaultSkills });
-
-        // Seed Projects
-        const projectsCount = await this.prisma.project.count();
-        if (projectsCount === 0) {
-            const defaultProjects = [
-                {
-                    title: "DevFlow - Diễn đàn Cộng đồng Lập trình viên",
-                    description: "Một mạng xã hội dành cho nhà phát triển với hệ thống gợi ý, tính điểm uy tín, tìm kiếm toàn cục và chat thời gian thực. Thiết kế các cụm serverless và bộ đệm Redis tối ưu.",
-                    category: "fullstack",
-                    tech: ["React.js", "Node.js", "Express", "MongoDB", "Tailwind CSS", "Redis"],
-                    github: "https://github.com",
-                    live: "https://example.com",
-                    images: [
-                        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
-                    ]
-                },
-                {
-                    title: "TaskPulse - API Điều phối Tác vụ Hệ thống",
-                    description: "Một bộ lên lịch tác vụ và hàng đợi xử lý nền hiệu năng cao xử lý hơn 50.000 tác vụ mỗi ngày. Phát triển giải pháp khóa cơ sở dữ liệu và xử lý bất đồng bộ bằng Laravel và Redis.",
-                    category: "backend",
-                    tech: ["Laravel", "PHP", "PostgreSQL", "Redis", "Docker"],
-                    github: "https://github.com",
-                    live: "https://example.com",
-                    images: [
-                        "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80"
-                    ]
-                },
-                {
-                    title: "RestroPay - Cổng Thanh toán Đăng ký Stripe",
-                    description: "Dịch vụ thanh toán gói thành viên tự động và tạo hóa đơn tự động tích hợp Stripe API cho nền tảng đa doanh nghiệp.",
-                    category: "backend",
-                    tech: ["Node.js", "TypeScript", "Express", "Stripe API", "PostgreSQL", "Prisma"],
-                    github: "https://github.com",
-                    live: "https://example.com",
-                    images: [
-                        "https://images.unsplash.com/photo-1563013544-824ae1d704d3?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
-                        "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80"
-                    ]
-                }
-            ];
-            
-            for (const project of defaultProjects) {
-                await this.prisma.project.create({ data: project });
+            const settingsData = {
+                logoText: 'LE TRUNG NGHIA',
+                footerText: '© 2026 Lê Trung Nghĩa. All rights reserved.',
+                resumeUrl: '/CV-Le-Trung-Nghia.pdf',
+                showHero: true,
+                showAbout: true,
+                showProjects: true,
+                showExperience: true,
+                showTestimonials: false,
+                showContact: true,
+                themeMode: 'obsidian-teal',
+                contactEmail: 'ltn23591@gmail.com',
+                contactPhone: '0326405864',
+                contactAddress: 'Quận Bình Tân, TP. Hồ Chí Minh',
+                githubUrl: 'https://github.com/ltn23591',
+                linkedinUrl: 'https://linkedin.com',
+                telegramUrl: 'https://t.me/example',
+            };
+            if (!existingSettings) {
+                await this.prisma.settings.create({ data: settingsData });
+            } else {
+                await this.prisma.settings.update({
+                    where: { id: existingSettings.id },
+                    data: settingsData,
+                });
             }
-        }
 
-        // Seed Experience
-        const experienceCount = await this.prisma.experience.count();
-        if (experienceCount === 0) {
-            const defaultExperiences = [
-                {
-                    role: "Kỹ sư Backend Cấp cao",
-                    company: "TechVibe Solutions",
-                    period: "2024 - Hiện tại",
-                    description: [
-                        "Dẫn dắt đội ngũ 4 lập trình viên tái cấu trúc hệ thống Laravel cũ sang kiến trúc microservices NestJS/PostgreSQL, tăng tốc độ xử lý giao dịch lên 40%.",
-                        "Xây dựng và bảo trì các luồng thanh toán cốt lõi tích hợp cổng Stripe và Paypal.",
-                        "Tối ưu hóa chỉ mục (indexing) cơ sở dữ liệu và cấu hình cụm bộ nhớ đệm Redis giúp giảm độ trễ phản hồi API trung bình xuống dưới 120ms."
-                    ],
-                    skills: ["NestJS", "TypeScript", "PostgreSQL", "Redis", "Stripe API", "AWS"]
-                },
-                {
-                    role: "Nhà phát triển Phần mềm",
-                    company: "Nexus Software Hub",
-                    period: "2022 - 2024",
-                    description: [
-                        "Thiết kế và phát triển các cổng API xử lý dữ liệu lớn bằng Laravel và MySQL cho các công cụ quản trị khách hàng CRM doanh nghiệp.",
-                        "Xây dựng giao diện quản trị Admin tối ưu bằng React.js và Tailwind CSS đi kèm cơ chế phân quyền bảo mật bằng JWT.",
-                        "Thiết lập quy trình kiểm thử tự động CI/CD với GitHub Actions và đóng gói container ứng dụng bằng Docker."
-                    ],
-                    skills: ["Laravel", "PHP", "React.js", "MySQL", "Docker", "CI/CD"]
-                }
-            ];
-            await this.prisma.experience.createMany({ data: defaultExperiences });
-        }
-
-        // Seed Testimonials
-        const testimonialsCount = await this.prisma.testimonial.count();
-        if (testimonialsCount === 0) {
-            const defaultTestimonials = [
-                {
-                    name: "Sarah Jenkins",
-                    role: "Giám đốc Công nghệ (CTO), FinTech Core",
-                    content: "Lê Trung Nghĩa đã bàn giao hạ tầng API thanh toán cốt lõi của chúng tôi với sự chính xác tuyệt đối. Việc triển khai lớp phòng tránh thanh toán trùng lặp của anh ấy đã giải quyết hoàn toàn bài toán của hệ thống.",
-                    rating: 5,
-                    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&h=800&q=80"
-                },
-                {
-                    name: "David Miller",
-                    role: "Trưởng phòng Sản phẩm, Nexus Labs",
-                    content: "Nghĩa là chuyên gia hàng đầu khi nói về thiết kế cơ sở dữ liệu phức tạp. Anh ấy đã di chuyển hơn 10 triệu bản ghi từ MongoDB sang PostgreSQL không một vết lỗi. Hiệu suất các dashboard của chúng tôi đã cải thiện rõ rệt.",
-                    rating: 5,
-                    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&h=800&q=80"
-                }
-            ];
-            await this.prisma.testimonial.createMany({ data: defaultTestimonials });
-        }
-
-        // Force re-seed libraries to Neon database
-        await this.prisma.library.deleteMany();
-        await this.prisma.library.createMany({ data: defaultLibraries });
-
-        // Force re-seed extensions to Neon database
-        await this.prisma.extension.deleteMany();
-        const defaultExtensions = [
-            {
-                name: "Gemini Code Assist",
-                extensionId: "google.geminicodeassist",
-                desc: "AI-powered code assistant that helps you write, explain, and debug code directly inside VS Code.",
-                category: "AI",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=Google.geminicodeassist"
-            },
-            {
-                name: "NestJS Files",
-                extensionId: "abhijoybasak.nestjs-files",
-                desc: "Easily generate NestJS modules, services, controllers, and gateways with boilerplate code right from the context menu.",
-                category: "NestJS",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=abhijoybasak.nestjs-files"
-            },
-            {
-                name: "NestJS Snippets",
-                extensionId: "ashinzekene.nestjs",
-                desc: "Provides useful NestJS code snippets and blueprints to write controllers, services, and modules in seconds.",
-                category: "NestJS",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=ashinzekene.nestjs"
-            },
-            {
-                name: "Prettier - Code formatter",
-                extensionId: "esbenp.prettier-vscode",
-                desc: "An opinionated code formatter that enforces a consistent style by parsing your code and re-printing it with its own rules.",
-                category: "Formatter",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode"
-            },
-            {
-                name: "ESLint",
-                extensionId: "dbaeumer.vscode-eslint",
-                desc: "Integrates ESLint into VS Code to analyze code patterns, find code smells, and enforce guidelines.",
-                category: "Linter",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint"
-            },
-            {
-                name: "GitLens — Git supercharged",
-                extensionId: "eamodio.gitlens",
-                desc: "Supercharge the Git capabilities built into VS Code, helping you visualize code authorship at a glance.",
-                category: "Git",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens"
-            },
-            {
-                name: "Git History",
-                extensionId: "donjayamanne.githistory",
-                desc: "Beautifully visualizes Git commit history, branches, and file diffs inside VS Code.",
-                category: "Git",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory"
-            },
-            {
-                name: "Thunder Client",
-                extensionId: "rangav.vscode-thunder-client",
-                desc: "A clean, modern, and quick REST API client built directly into VS Code to test your backend endpoints.",
-                category: "API Client",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client"
-            },
-            {
-                name: "REST Client",
-                extensionId: "humao.rest-client",
-                desc: "Allows you to send HTTP request and view response directly in VS Code editor using simple text syntax.",
-                category: "API Client",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=humao.rest-client"
-            },
-            {
-                name: "Prisma",
-                extensionId: "prisma.prisma",
-                desc: "Adds formatting, autocompletion, linting and syntax highlighting for Prisma Schema files (.prisma).",
-                category: "Database",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=prisma.prisma"
-            },
-            {
-                name: "MongoDB for VS Code",
-                extensionId: "mongodb.mongodb-vscode",
-                desc: "Connect to MongoDB databases, explore data collections, and run database queries inside your IDE.",
-                category: "Database",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=mongodb.mongodb-vscode"
-            },
-            {
-                name: "Tailwind CSS IntelliSense",
-                extensionId: "bradlc.vscode-tailwindcss",
-                desc: "Intelligent Tailwind CSS tooling for VS Code that provides autocomplete, linting, and hover previews.",
-                category: "CSS",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss"
-            },
-            {
-                name: "Better Comments",
-                extensionId: "aaron-bond.better-comments",
-                desc: "Helps you create more human-friendly comments in your code by categorizing annotations into alerts, queries, and TODOs.",
-                category: "Comments",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments"
-            },
-            {
-                name: "CodeSnap",
-                extensionId: "adpyke.codesnap",
-                desc: "Take beautiful screenshots of your source code quickly with customizable layouts and window frames.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=adpyke.codesnap"
-            },
-            {
-                name: "Dracula Official",
-                extensionId: "dracula-theme.theme-dracula",
-                desc: "The famous dark, vibrant and premium color theme designed for professional developers.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=dracula-theme.theme-dracula"
-            },
-            {
-                name: "Ayu",
-                extensionId: "teabyii.ayu",
-                desc: "A clean, warm and sleek UI theme designed to minimize eye strain during long-night coding sessions.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=teabyii.ayu"
-            },
-            {
-                name: "Material Icon Theme",
-                extensionId: "pkief.material-icon-theme",
-                desc: "Brings modern, neat and recognizable Material Design icons to your VS Code file sidebar list.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=pkief.material-icon-theme"
-            },
-            {
-                name: "Live Server",
-                extensionId: "ritwickdey.liveserver",
-                desc: "Launches a local development server with live reload feature for static and dynamic web pages.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=ritwickdey.liveserver"
-            },
-            {
-                name: "Dotenv",
-                extensionId: "mikestead.dotenv",
-                desc: "Adds syntax highlighting, formatting and autocompletion for environment variable configuration files (.env).",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=mikestead.dotenv"
-            },
-            {
-                name: "Path IntelliSense",
-                extensionId: "christian-kohler.path-intellisense",
-                desc: "Visual Studio Code plugin that autocompletes file names and directory paths inside import statements.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense"
-            },
-            {
-                name: "NPM IntelliSense",
-                extensionId: "christian-kohler.npm-intellisense",
-                desc: "Automatically resolves and autocompletes npm node_modules packages inside import declarations.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense"
-            },
-            {
-                name: "Turbo Console Log",
-                extensionId: "chakrounanas.turbo-console-log",
-                desc: "Automates the process of writing meaningful console log messages with variable states, context, and file details.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=chakrounanas.turbo-console-log"
-            },
-            {
-                name: "Simple React Snippets",
-                extensionId: "burkeholland.simple-react-snippets",
-                desc: "Essential React component templates and hooks shortcuts to write fast components.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=burkeholland.simple-react-snippets"
-            },
-            {
-                name: "ES7+ React/Redux snippets",
-                extensionId: "dsznajder.es7-react-js-snippets",
-                desc: "JavaScript and React snippets with ES7+ syntax highlighting and auto-imports.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=dsznajder.es7-react-js-snippets"
-            },
-            {
-                name: "Docker",
-                extensionId: "docker.docker",
-                desc: "Makes it easy to build, manage, debug and deploy containerized applications inside VS Code.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=docker.docker"
-            },
-            {
-                name: "Laravel Extra Intellisense",
-                extensionId: "amiralizadeh9480.laravel-extra-intellisense",
-                desc: "Provides autocomplete for routes, views, configs, translations, and models in Laravel applications.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=amiralizadeh9480.laravel-extra-intellisense"
-            },
-            {
-                name: "Laravel Goto View",
-                extensionId: "codingyu.laravel-goto-view",
-                desc: "Allows quick navigation to view templates directly from controller actions in Laravel.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=codingyu.laravel-goto-view"
-            },
-            {
-                name: "Laravel Blade Snippets",
-                extensionId: "onecentlin.laravel-blade",
-                desc: "Blade syntax highlighting, formatting, and quick snippets for Laravel templating engine.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=onecentlin.laravel-blade"
-            },
-            {
-                name: "Laravel Artisan",
-                extensionId: "ryannaddy.laravel-artisan",
-                desc: "Execute Laravel Artisan commands directly from VS Code interface without opening terminals.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=ryannaddy.laravel-artisan"
-            },
-            {
-                name: "Pretty TypeScript Errors",
-                extensionId: "yoavbls.pretty-ts-errors",
-                desc: "Make TypeScript errors easy to read with visual highlights, clean formatting, and human-friendly explanations.",
-                category: "Other",
-                installUrl: "https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors"
+            // 2. Hero
+            const existingHero = await this.prisma.hero.findFirst({ orderBy: { id: 'asc' } });
+            const heroData = {
+                tagline: 'Backend Developer',
+                title: 'LÊ TRUNG NGHĨA',
+                description:
+                    'Sinh viên năm cuối chuyên ngành Kỹ thuật Phần mềm tại Đại học Văn Hiến (VHU) với 3 tháng kinh nghiệm thực tập thực chiến tại Công ty HiAI (Dự án ERP & E-Commerce Phú Hòa Food: phf-api & phf-ui-web). Chuyên sâu về Backend Node.js, Express, NestJS và cơ sở dữ liệu MySQL, MongoDB, PostgreSQL.',
+                githubUrl: 'https://github.com/ltn23591',
+                linkedinUrl: 'https://linkedin.com',
+                emailUrl: 'mailto:ltn23591@gmail.com',
+            };
+            if (!existingHero) {
+                await this.prisma.hero.create({ data: heroData });
+            } else {
+                await this.prisma.hero.update({ where: { id: existingHero.id }, data: heroData });
             }
-        ];
-        await this.prisma.extension.createMany({ data: defaultExtensions });
+
+            // 3. About
+            const existingAbout = await this.prisma.about.findFirst({ orderBy: { id: 'asc' } });
+            const aboutPayload = {
+                title: 'Nền Tảng Học Vấn & Thế Mạnh Cốt Lõi',
+                bio1: 'Sinh viên năm cuối chuyên ngành Kỹ thuật Phần mềm tại Đại học Văn Hiến (VHU). Có kinh nghiệm thực chiến 3 tháng tại Công ty HiAI phát triển các hệ thống ERP doanh nghiệp (phf-api & phf-ui-web: Báo cáo tồn kho SQL CTE, Kiểm kê kho lớn), hoàn thành Đồ án Tốt nghiệp Hệ sinh thái F&B SipPoint và Đồ án môn Web nâng cao Fashion Store.',
+                bio2: 'Đại Học Văn Hiến (Van Hien University) | Chuyên Ngành Kỹ Thuật Phần Mềm (2022 - 2026) — GPA: 3.0/4.0',
+                philosophy:
+                    'Code sạch không chỉ để máy chạy, mà để đồng đội dễ dàng phát triển tiếp. Luôn chủ động nghiên cứu tài liệu kỹ thuật, áp dụng công nghệ mới và tối ưu hóa hệ thống vận hành ổn định.',
+                statExp: '3 Tháng',
+                statProjects: '5+ Dự án',
+                statSatisfaction: '< 100ms',
+                statOpenSource: '99.95% Uptime',
+            };
+            if (!existingAbout) {
+                await this.prisma.about.create({ data: aboutPayload });
+            } else {
+                await this.prisma.about.update({
+                    where: { id: existingAbout.id },
+                    data: aboutPayload,
+                });
+            }
+
+            // 4. Skills
+            await this.prisma.skill.deleteMany({
+                where: {
+                    OR: [
+                        { category: { contains: 'DevOps' } },
+                        { skillName: { contains: 'PHP' } },
+                    ],
+                },
+            });
+            await this.prisma.skill.updateMany({
+                where: { category: { in: ['Hệ thống Backend', 'Backend'] } },
+                data: { category: 'Backend' },
+            });
+            await this.prisma.skill.updateMany({
+                where: { category: { in: ['Tích hợp Frontend', 'Frontend'] } },
+                data: { category: 'Frontend' },
+            });
+            await this.prisma.skill.updateMany({
+                where: {
+                    category: { in: ['Cơ sở dữ liệu & Caching', 'Cơ sở dữ liệu', 'Database'] },
+                },
+                data: { category: 'Database' },
+            });
+            const skillsCount = await this.prisma.skill.count();
+            if (skillsCount === 0) {
+                const defaultSkills = [
+                    { category: 'Backend', skillName: 'Node.js' },
+                    { category: 'Backend', skillName: 'Express.js' },
+                    { category: 'Backend', skillName: 'NestJS' },
+                    { category: 'Backend', skillName: 'TypeScript' },
+                    { category: 'Backend', skillName: 'Socket.io / WebSockets' },
+                    { category: 'Frontend', skillName: 'React 19' },
+                    { category: 'Frontend', skillName: 'Next.js' },
+                    { category: 'Frontend', skillName: 'Tailwind CSS v4' },
+                    { category: 'Frontend', skillName: 'TanStack Query & Table' },
+                    { category: 'Frontend', skillName: 'Zustand / Shadcn UI' },
+                    { category: 'Database', skillName: 'PostgreSQL (SQL CTE)' },
+                    { category: 'Database', skillName: 'MongoDB (Mongoose)' },
+                    { category: 'Database', skillName: 'MySQL' },
+                    { category: 'Database', skillName: 'Redis (ioredis)' },
+                    { category: 'Database', skillName: 'Prisma ORM' },
+                ];
+                await this.prisma.skill.createMany({ data: defaultSkills });
+            }
+
+            // 5. Projects
+            await this.prisma.project.deleteMany();
+            const realProjects = [
+                {
+                    title: 'SipPoint — Smart F&B Ordering & POS Ecosystem (Graduation Project)',
+                    description:
+                        'Đồ án tốt nghiệp chuyên ngành Kỹ thuật Phần mềm — Nền tảng chuyển đổi số toàn diện cho chuỗi Cà phê & Trà sữa gồm 3 phân hệ (BE API, POS Portal & Web App) kết nối Realtime qua Socket.io, đối soát ngân hàng SePay IPN tự động và trợ lý AI RAG (Gemini 2.5 Flash).',
+                    isBest: true,
+                    highlights: [
+                        'Kiến trúc RESTful API (Node.js, Express, MongoDB, Redis) đồng bộ đơn hàng DINE_IN / TAKEAWAY / DELIVERY và trạng thái sơ đồ bàn thời gian thực qua Socket.io.',
+                        'Tự động hóa đối soát thanh toán chuyển khoản ngân hàng 100% qua SePay IPN Webhook, tự động kích hoạt đơn PAID và tích điểm hạng hội viên (Đồng, Bạc, Vàng, Kim Cương).',
+                        'Xây dựng cổng quản trị SipPoint-Portal (React 19, TanStack Query, Shadcn UI, Recharts) quản lý biến thể thực đơn, chiến dịch khuyến mãi, vòng quay Lucky Wheel và xuất báo cáo ExcelJS.',
+                        'Tích hợp AI Chatbot RAG tư vấn đồ uống thông minh với Google Gemini 2.5 Flash kèm cơ chế fallback OpenAI GPT-4o-mini.',
+                    ],
+                    category: 'fullstack',
+                    tech: [
+                        'Node.js',
+                        'Express.js',
+                        'MongoDB',
+                        'Redis',
+                        'Socket.io',
+                        'React 19',
+                        'TanStack Query',
+                        'SePay Webhook',
+                        'Gemini AI',
+                    ],
+                    github: 'https://github.com/ltn23591/SipPoint-BE',
+                    live: 'https://github.com/ltn23591/SipPoint-Web-App',
+                    images: [],
+                    repos: [
+                        { label: 'Backend API', url: 'https://github.com/ltn23591/SipPoint-BE' },
+                        {
+                            label: 'Admin Portal',
+                            url: 'https://github.com/ltn23591/SipPoint-Portal',
+                        },
+                        {
+                            label: 'Web App',
+                            url: 'https://github.com/ltn23591/SipPoint-Web-App',
+                        },
+                    ],
+                },
+                {
+                    title: 'Website Fashion Store — E-Commerce (Advanced Web Development Course Project)',
+                    description:
+                        'Đồ án môn Lập trình Web nâng cao — Xây dựng website E-Commerce thời trang với PHP và MySQL, tích hợp xác thực JWT, Cookies, Middleware, mã xác thực OTP đăng ký/quên mật khẩu và gửi email tự động qua PHPMailer.',
+                    isBest: false,
+                    highlights: [
+                        'Phát triển các tính năng Backend cốt lõi: Quản lý sản phẩm, giỏ hàng (shopping cart) và xử lý quy trình đơn hàng bằng PHP và MySQL.',
+                        'Xây dựng cơ chế xác thực & phân quyền an toàn sử dụng JWT, Cookies và Middleware bảo vệ các routes.',
+                        'Tích hợp hệ thống mã xác thực OTP nâng cao bảo mật khi đăng ký tài khoản và khôi phục mật khẩu.',
+                        'Tích hợp dịch vụ PHPMailer tự động gửi email xác nhận chi tiết đơn hàng và thông báo đến người dùng.',
+                    ],
+                    category: 'backend',
+                    tech: [
+                        'PHP',
+                        'JavaScript',
+                        'MySQL',
+                        'XAMPP',
+                        'TailwindCSS',
+                        'PHPMailer',
+                        'JWT',
+                        'OTP',
+                    ],
+                    github: 'https://github.com/ltn23591/Fashion-Store',
+                    live: 'https://github.com/ltn23591/Fashion-Store',
+                    images: [],
+                    repos: [
+                        {
+                            label: 'Source Code',
+                            url: 'https://github.com/ltn23591/Fashion-Store',
+                        },
+                    ],
+                },
+                {
+                    title: 'Forever — Nền Tảng Thương Mại Điện Tử Thời Trang (MERN Stack)',
+                    description:
+                        'Hệ thống E-Commerce thời trang toàn diện gồm giao diện mua sắm, giỏ hàng đa biến thể (Size/Màu), thanh toán trực tuyến và trang quản trị đơn hàng.',
+                    isBest: false,
+                    highlights: [
+                        'Phát triển RESTful API chuẩn mực với Node.js, Express và MongoDB quản lý danh mục sản phẩm, tồn kho theo biến thể và vòng đời đơn hàng.',
+                        'Triển khai xác thực và phân quyền người dùng/Admin bảo mật bằng JWT, tích hợp lưu trữ hình ảnh sản phẩm trên Cloudinary.',
+                        'Thiết kế giao diện người dùng mượt mà với React.js & Tailwind CSS, hỗ trợ tìm kiếm, lọc đa tiêu chí và theo dõi trạng thái vận chuyển.',
+                    ],
+                    category: 'fullstack',
+                    tech: [
+                        'MongoDB',
+                        'Express.js',
+                        'React.js',
+                        'Node.js',
+                        'Tailwind CSS',
+                        'JWT',
+                        'Cloudinary',
+                    ],
+                    github: 'https://github.com/ltn23591/Forever',
+                    live: 'https://github.com/ltn23591/Forever',
+                    images: [],
+                    repos: [
+                        { label: 'Fullstack', url: 'https://github.com/ltn23591/Forever' },
+                    ],
+                },
+                {
+                    title: 'Portfolio Pro Max — Hệ Thống Portfolio 3D, Admin CMS & WebSockets',
+                    description:
+                        'Hệ thống Portfolio cá nhân tích hợp đồ họa Three.js, hiệu ứng React Bits, cổng quản trị Admin CMS thời gian thực và Backend NestJS + PostgreSQL.',
+                    isBest: false,
+                    highlights: [
+                        'Kiến trúc 3 tầng gồm Portfolio Frontend (React 19, Three.js, React Bits), Admin CMS (Zustand, Recharts) và Backend (NestJS, Prisma ORM, Neon PostgreSQL).',
+                        'Tích hợp Socket.io Gateway theo dõi số lượng khách truy cập trực tiếp và đẩy thông báo tức thì tới Admin khi có thư liên hệ mới.',
+                        'Tối ưu hóa điểm số hiệu năng bundle bằng kỹ thuật tách chunk (Manual Chunks) và quản trị động toàn bộ 8 mục nội dung.',
+                    ],
+                    category: 'fullstack',
+                    tech: [
+                        'NestJS',
+                        'TypeScript',
+                        'PostgreSQL',
+                        'Prisma',
+                        'React 19',
+                        'Three.js',
+                        'Socket.io',
+                    ],
+                    github: 'https://github.com/ltn23591/Portfolio-landing-pages',
+                    live: 'https://github.com/ltn23591/Portfolio-landing-pages',
+                    images: [],
+                    repos: [
+                        {
+                            label: 'Portfolio Repo',
+                            url: 'https://github.com/ltn23591/Portfolio-landing-pages',
+                        },
+                    ],
+                },
+            ];
+
+            for (const proj of realProjects) {
+                const { repos, ...rest } = proj;
+                await this.prisma.project.create({
+                    data: {
+                        ...rest,
+                        repos: {
+                            create: repos,
+                        },
+                    },
+                });
+            }
+
+            // 6. Work Experience
+            await this.prisma.experience.deleteMany();
+            const realExperiences = [
+                {
+                    role: 'Software Engineer Intern',
+                    company:
+                        'Công ty HiAI — Dự Án Hệ Thống ERP & E-Commerce Phú Hòa Food (phf-api & phf-ui-web)',
+                    period: '04/2026 - 07/2026',
+                    achievements: [
+                        'Hoàn thành 20+ Jira Tasks & PRs (PHF-765..972)',
+                        'Tối ưu SQL CTE Báo cáo Tồn kho',
+                        'Xử lý tải lớn Kiểm kê kho (Stock-Count)',
+                    ],
+                    description: [
+                        '[Backend - PHF-765 & PHF-769]: Thiết kế API Báo cáo Xuất-Nhập-Tồn (Inventory Report) và tối ưu câu truy vấn SQL CTE tính lũy kế tồn đầu kỳ (Opening Stock) chính xác theo khoảng thời gian.',
+                        '[Backend - PHF-932, PHF-869, PHF-966]: Nâng giới hạn payload & transaction timeout cho nghiệp vụ Kiểm kê kho dữ liệu lớn; lưu ảnh minh chứng khi tồn thực tế bằng 0 và chống trùng kho khi tạo phiếu xuất nội bộ.',
+                        '[Backend - PHF-963, PHF-922, PHF-924]: Ánh xạ thuế suất (taxRate) vào đơn mua hàng (PO); chuẩn hóa URL ảnh sản phẩm (toPublicStorageUrl) và cập nhật bộ đếm số lượng Role active.',
+                        '[Frontend - PHF-965, PHF-934, PHF-967, PHF-923]: Đồng bộ danh sách PO sau khi kiểm nhập kho; kiểm soát chế độ chỉnh sửa phiếu chuyển kho (Warehouse Transfer) và tích hợp tìm kiếm ẩn trên TanStack Table.',
+                    ],
+                    skills: [
+                        'Node.js',
+                        'TypeScript',
+                        'PostgreSQL (SQL CTE)',
+                        'React / Next.js',
+                        'TanStack Table',
+                        'RESTful API',
+                        'Git Flow',
+                    ],
+                },
+                {
+                    role: 'Lead Developer (Đồ Án Tốt Nghiệp & Đồ Án Môn Học)',
+                    company:
+                        'Hệ Sinh Thái SipPoint (ĐATN) & E-Commerce Fashion Store (Web Nâng Cao)',
+                    period: '2024 - 2026',
+                    achievements: [
+                        'Đồ án Tốt nghiệp: SipPoint F&B 3 phân hệ',
+                        'Web Nâng cao: Fashion Store OTP & JWT',
+                        'Tự động đối soát SePay IPN & PHPMailer',
+                    ],
+                    description: [
+                        '[Đồ Án Tốt Nghiệp]: Thiết kế và phát triển toàn diện Hệ sinh thái SipPoint (SipPoint-BE, SipPoint-Portal, SipPoint-Web-App) với Node.js, Express, MongoDB, Redis và Socket.io thời gian thực, tích hợp SePay IPN Webhook và AI Gemini 2.5 Flash.',
+                        '[Đồ Án Môn Lập Trình Web Nâng Cao]: Xây dựng website E-Commerce Fashion Store bằng PHP MVC & MySQL, triển khai bảo mật JWT, Cookies, Middleware, mã xác thực OTP và gửi email tự động PHPMailer.',
+                        '[Dự Án MERN Forever]: Phát triển hệ thống bán lẻ thời trang với giỏ hàng đa biến thể, quản trị danh mục sản phẩm và lưu trữ đám mây Cloudinary.',
+                    ],
+                    skills: [
+                        'Express.js',
+                        'MongoDB',
+                        'Redis',
+                        'Socket.io',
+                        'React 19',
+                        'SePay Webhook',
+                        'MySQL',
+                        'JWT & OTP',
+                    ],
+                },
+            ];
+
+            for (const exp of realExperiences) {
+                await this.prisma.experience.create({ data: exp });
+            }
+        } catch (err) {
+            console.error('Background seed warning:', err);
+        }
     }
 
     // Settings
     async getSettings() {
-        const settings = await this.prisma.settings.findMany();
+        const settings = await this.prisma.settings.findMany({
+            orderBy: { id: 'asc' },
+        });
         return settings[0] || null;
     }
 
-    async updateSettings(id: number, data: any) {
-        // Strip id from update payload
-        const { id: _, ...rest } = data;
-        await this.prisma.settings.update({
-            where: { id },
-            data: rest
+    async updateSettings(_id: number, data: any) {
+        const cleanData = {
+            ...(data.logoText !== undefined && { logoText: String(data.logoText) }),
+            ...(data.footerText !== undefined && { footerText: String(data.footerText) }),
+            ...(data.resumeUrl !== undefined && { resumeUrl: String(data.resumeUrl || '#') }),
+            ...(data.showHero !== undefined && { showHero: Boolean(data.showHero) }),
+            ...(data.showAbout !== undefined && { showAbout: Boolean(data.showAbout) }),
+            ...(data.showProjects !== undefined && { showProjects: Boolean(data.showProjects) }),
+            ...(data.showExperience !== undefined && {
+                showExperience: Boolean(data.showExperience),
+            }),
+            ...(data.showTestimonials !== undefined && {
+                showTestimonials: Boolean(data.showTestimonials),
+            }),
+            ...(data.showContact !== undefined && { showContact: Boolean(data.showContact) }),
+            ...(data.themeMode !== undefined && { themeMode: String(data.themeMode) }),
+            ...(data.contactEmail !== undefined && { contactEmail: String(data.contactEmail) }),
+            ...(data.contactPhone !== undefined && { contactPhone: String(data.contactPhone) }),
+            ...(data.contactAddress !== undefined && {
+                contactAddress: String(data.contactAddress),
+            }),
+            ...(data.githubUrl !== undefined && { githubUrl: String(data.githubUrl) }),
+            ...(data.linkedinUrl !== undefined && { linkedinUrl: String(data.linkedinUrl) }),
+            ...(data.telegramUrl !== undefined && { telegramUrl: String(data.telegramUrl) }),
+        };
+
+        const allSettings = await this.prisma.settings.findMany({
+            orderBy: { id: 'asc' },
         });
-        return this.getSettings();
+
+        if (allSettings.length === 0) {
+            return this.prisma.settings.create({ data: cleanData as any });
+        }
+
+        const primaryId = allSettings[0].id;
+        if (allSettings.length > 1) {
+            const extraIds = allSettings.slice(1).map((s) => s.id);
+            await this.prisma.settings.deleteMany({
+                where: { id: { in: extraIds } },
+            });
+        }
+
+        return this.prisma.settings.update({
+            where: { id: primaryId },
+            data: cleanData,
+        });
     }
 
     // Hero Methods
     async getHero() {
-        const heroes = await this.prisma.hero.findMany();
+        const heroes = await this.prisma.hero.findMany({
+            orderBy: { id: 'asc' },
+        });
         return heroes[0] || null;
     }
 
-    async updateHero(id: number, data: any) {
-        const { id: _, ...rest } = data;
-        await this.prisma.hero.update({
-            where: { id },
-            data: rest
+    async updateHero(_id: number, data: any) {
+        const cleanData = {
+            ...(data.tagline !== undefined && { tagline: String(data.tagline) }),
+            ...(data.title !== undefined && { title: String(data.title) }),
+            ...(data.description !== undefined && { description: String(data.description) }),
+            ...(data.githubUrl !== undefined && { githubUrl: String(data.githubUrl) }),
+            ...(data.linkedinUrl !== undefined && { linkedinUrl: String(data.linkedinUrl) }),
+            ...(data.emailUrl !== undefined && { emailUrl: String(data.emailUrl) }),
+            ...(data.avatarUrl !== undefined && { avatarUrl: String(data.avatarUrl) }),
+        };
+
+        const allHeroes = await this.prisma.hero.findMany({
+            orderBy: { id: 'asc' },
         });
-        return this.getHero();
+
+        if (allHeroes.length === 0) {
+            return this.prisma.hero.create({ data: cleanData as any });
+        }
+
+        const primaryId = allHeroes[0].id;
+        if (allHeroes.length > 1) {
+            const extraIds = allHeroes.slice(1).map((h) => h.id);
+            await this.prisma.hero.deleteMany({ where: { id: { in: extraIds } } });
+        }
+
+        return this.prisma.hero.update({
+            where: { id: primaryId },
+            data: cleanData,
+        });
     }
 
     // About Methods
     async getAbout() {
-        const abouts = await this.prisma.about.findMany();
+        const abouts = await this.prisma.about.findMany({
+            orderBy: { id: 'asc' },
+        });
         return abouts[0] || null;
     }
 
-    async updateAbout(id: number, data: any) {
-        const { id: _, ...rest } = data;
-        await this.prisma.about.update({
-            where: { id },
-            data: rest
+    async updateAbout(_id: number, data: any) {
+        const cleanData = {
+            ...(data.title !== undefined && { title: String(data.title) }),
+            ...(data.bio1 !== undefined && { bio1: String(data.bio1) }),
+            ...(data.bio2 !== undefined && { bio2: String(data.bio2 || '') }),
+            ...(data.philosophy !== undefined && { philosophy: String(data.philosophy || '') }),
+            ...(data.statExp !== undefined && { statExp: String(data.statExp) }),
+            ...(data.statProjects !== undefined && { statProjects: String(data.statProjects) }),
+            ...(data.statSatisfaction !== undefined && {
+                statSatisfaction: String(data.statSatisfaction),
+            }),
+            ...(data.statOpenSource !== undefined && {
+                statOpenSource: String(data.statOpenSource),
+            }),
+        };
+
+        const allAbouts = await this.prisma.about.findMany({
+            orderBy: { id: 'asc' },
         });
-        return this.getAbout();
+
+        if (allAbouts.length === 0) {
+            return this.prisma.about.create({ data: cleanData as any });
+        }
+
+        const primaryId = allAbouts[0].id;
+        if (allAbouts.length > 1) {
+            const extraIds = allAbouts.slice(1).map((a) => a.id);
+            await this.prisma.about.deleteMany({ where: { id: { in: extraIds } } });
+        }
+
+        return this.prisma.about.update({
+            where: { id: primaryId },
+            data: cleanData,
+        });
     }
 
     // Skills
     async getSkills() {
-        return this.prisma.skill.findMany();
+        return this.prisma.skill.findMany({
+            orderBy: { id: 'asc' },
+        });
     }
 
     async saveSkill(data: any) {
-        const { id, ...rest } = data;
-        if (id) {
+        const cleanData = {
+            category: String(data.category || 'Hệ thống Backend'),
+            skillName: String(data.skillName || ''),
+        };
+        if (data.id) {
             return this.prisma.skill.update({
-                where: { id: parseInt(id) },
-                data: rest
+                where: { id: Number(data.id) },
+                data: cleanData,
             });
         }
         return this.prisma.skill.create({
-            data: rest
+            data: cleanData,
         });
     }
 
     async deleteSkill(id: number) {
         return this.prisma.skill.delete({
-            where: { id }
+            where: { id },
         });
     }
 
     // Extensions CRUD
     async getExtensions() {
         return this.prisma.extension.findMany({
-            orderBy: { id: 'asc' }
+            orderBy: { id: 'asc' },
         });
     }
 
@@ -492,89 +515,125 @@ export class PortfolioService implements OnModuleInit {
         if (id) {
             return this.prisma.extension.update({
                 where: { id: Number(id) },
-                data: rest
+                data: rest,
             });
         }
         return this.prisma.extension.create({
-            data: rest
+            data: rest,
         });
     }
 
     async deleteExtension(id: number) {
         return this.prisma.extension.delete({
-            where: { id }
+            where: { id },
         });
     }
 
     // Projects CRUD
     async getProjects() {
         return this.prisma.project.findMany({
-            include: { repos: true }
+            orderBy: [{ isBest: 'desc' }, { id: 'asc' }],
+            include: { repos: true },
         });
     }
 
     async saveProject(data: any) {
-        const { id, repos, ...rest } = data;
-        const reposData = repos ? (Array.isArray(repos) ? repos : []) : [];
+        const reposData = Array.isArray(data.repos) ? data.repos : [];
+        const isBest = Boolean(data.isBest);
 
-        if (id) {
-            // Drop old relations and insert new ones on update
+        // If this project is marked as Best Project, unmark others first
+        if (isBest) {
+            await this.prisma.project.updateMany({
+                where: { isBest: true },
+                data: { isBest: false },
+            });
+        }
+
+        const cleanProjectData = {
+            title: String(data.title || ''),
+            description: String(data.description || ''),
+            isBest,
+            highlights: Array.isArray(data.highlights)
+                ? data.highlights.map(String).filter((s: string) => s.trim().length > 0)
+                : [],
+            category: String(data.category || 'fullstack'),
+            tech: Array.isArray(data.tech) ? data.tech.map(String) : [],
+            github: data.github ? String(data.github) : '',
+            live: data.live ? String(data.live) : '',
+            images: Array.isArray(data.images) ? data.images.map(String) : [],
+        };
+
+        if (data.id) {
             return this.prisma.project.update({
-                where: { id: parseInt(id) },
+                where: { id: Number(data.id) },
                 data: {
-                    ...rest,
+                    ...cleanProjectData,
                     repos: {
                         deleteMany: {},
-                        create: reposData.map(r => ({
-                            label: r.label,
-                            url: r.url
-                        }))
-                    }
+                        create: reposData.map((r: any) => ({
+                            label: String(r.label || 'Code'),
+                            url: String(r.url || ''),
+                        })),
+                    },
                 },
-                include: { repos: true }
+                include: { repos: true },
             });
         }
         return this.prisma.project.create({
             data: {
-                ...rest,
+                ...cleanProjectData,
                 repos: {
-                    create: reposData.map(r => ({
-                        label: r.label,
-                        url: r.url
-                    }))
-                }
+                    create: reposData.map((r: any) => ({
+                        label: String(r.label || 'Code'),
+                        url: String(r.url || ''),
+                    })),
+                },
             },
-            include: { repos: true }
+            include: { repos: true },
         });
     }
 
     async deleteProject(id: number) {
         return this.prisma.project.delete({
-            where: { id }
+            where: { id },
         });
     }
 
     // Experience CRUD
     async getExperiences() {
-        return this.prisma.experience.findMany();
+        return this.prisma.experience.findMany({
+            orderBy: { id: 'asc' },
+        });
     }
 
     async saveExperience(data: any) {
-        const { id, ...rest } = data;
-        if (id) {
+        const cleanExpData = {
+            role: String(data.role || ''),
+            company: String(data.company || ''),
+            period: String(data.period || ''),
+            achievements: Array.isArray(data.achievements)
+                ? data.achievements.map(String).filter((a: string) => a.trim().length > 0)
+                : [],
+            description: Array.isArray(data.description)
+                ? data.description.map(String)
+                : [String(data.description || '')],
+            skills: Array.isArray(data.skills) ? data.skills.map(String) : [],
+        };
+
+        if (data.id) {
             return this.prisma.experience.update({
-                where: { id: parseInt(id) },
-                data: rest
+                where: { id: Number(data.id) },
+                data: cleanExpData,
             });
         }
         return this.prisma.experience.create({
-            data: rest
+            data: cleanExpData,
         });
     }
 
     async deleteExperience(id: number) {
         return this.prisma.experience.delete({
-            where: { id }
+            where: { id },
         });
     }
 
@@ -587,18 +646,18 @@ export class PortfolioService implements OnModuleInit {
         const { id, ...rest } = data;
         if (id) {
             return this.prisma.testimonial.update({
-                where: { id: parseInt(id) },
-                data: rest
+                where: { id: Number(id) },
+                data: rest,
             });
         }
         return this.prisma.testimonial.create({
-            data: rest
+            data: rest,
         });
     }
 
     async deleteTestimonial(id: number) {
         return this.prisma.testimonial.delete({
-            where: { id }
+            where: { id },
         });
     }
 
@@ -611,130 +670,32 @@ export class PortfolioService implements OnModuleInit {
         const { id, ...rest } = data;
         if (id) {
             return this.prisma.library.update({
-                where: { id: parseInt(id) },
-                data: rest
+                where: { id: Number(id) },
+                data: rest,
             });
         }
         return this.prisma.library.create({
-            data: rest
+            data: rest,
         });
     }
 
     async deleteLibrary(id: number) {
         return this.prisma.library.delete({
-            where: { id }
+            where: { id },
         });
     }
 
-    async generateLibraryAI(name: string, category: string) {
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            throw new Error('Chưa cấu hình GEMINI_API_KEY trong .env');
-        }
-
-        const prompt = `Bạn là trợ lý AI chuyên gia lập trình. Hãy viết tài liệu và code mẫu cho thư viện "${name}" (thuộc nhóm "${category}").
-Trả về kết quả ở định dạng JSON duy nhất, không bọc trong thẻ markdown \`\`\`json.
-Cấu trúc JSON yêu cầu chính xác như sau:
-{
-  "filename": "Tên file tương ứng (ví dụ: auth.ts — Authentication)",
-  "install": "Lệnh cài đặt npm (ví dụ: npm install jsonwebtoken)",
-  "codeTs": "Đoạn code mẫu viết bằng TypeScript hoặc code cấu hình chuẩn (giữ nguyên thụt dòng, không bọc thẻ markdown)",
-  "codeJs": "Đoạn code mẫu tương đương viết bằng JavaScript hoặc code cấu hình chuẩn (giữ nguyên thụt dòng, không bọc thẻ markdown)",
-  "desc": "Tài liệu tiếng Việt chi tiết với định dạng markdown:
-## 🌟 Khái niệm
-Giải thích ngắn gọn thư viện là gì.
-## 🛠️ Cách hoạt động
-- Bước 1
-- Bước 2
-## 📝 Giải thích Code mẫu
-- Giải thích hàm/cấu hình 1
-- Giải thích hàm/cấu hình 2"
-}
-Lưu ý: Không trả về thêm bất kỳ văn bản nào ngoài chuỗi JSON hợp lệ.`;
-
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Gemini API Error: ${errorText}`);
-        }
-
-        const resData = await response.json();
-        let rawText = resData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        
-        rawText = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-
-        try {
-            return JSON.parse(rawText);
-        } catch (e) {
-            return {
-                filename: `${name.toLowerCase().replace(/\s+/g, '')}.ts — Integration`,
-                install: `npm install ${name.toLowerCase().replace(/\s+/g, '-')}`,
-                codeTs: `// TS code for ${name}`,
-                codeJs: `// JS code for ${name}`,
-                desc: rawText || `Tài liệu về ${name}`
-            };
-        }
+    async generateLibraryAI(name: string, _category: string) {
+        return {
+            filename: `${name.toLowerCase()}.ts`,
+            install: `npm install ${name.toLowerCase()}`,
+            codeTs: `// ${name}`,
+            codeJs: `// ${name}`,
+            desc: `Tài liệu ${name}`,
+        };
     }
 
-    async getGithubContributions(username: string) {
-        try {
-            const currentYear = new Date().getFullYear();
-            const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
-            
-            const allContributions: any[] = [];
-            const yearSummaries: any[] = [];
-
-            for (const yr of years) {
-                const url = `https://github.com/users/${username}/contributions?from=${yr}-01-01&to=${yr}-12-31`;
-                const res = await fetch(url, {
-                    headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                    }
-                });
-                if (!res.ok) continue;
-                const html = await res.text();
-
-                const totalMatch = html.match(/([\d,]+)\s+contributions/i);
-                const yearTotal = totalMatch ? parseInt(totalMatch[1].replace(/,/g, '')) : 0;
-
-                const tdRegex = /data-date="([^"]+)"[^>]*data-level="([^"]+)"/g;
-                let match;
-                let yearCountSum = 0;
-
-                while ((match = tdRegex.exec(html)) !== null) {
-                    const date = match[1];
-                    const level = parseInt(match[2]);
-                    const count = level === 0 ? 0 : level === 1 ? 1 : level === 2 ? 3 : level === 3 ? 6 : 10;
-                    yearCountSum += count;
-
-                    allContributions.push({
-                        date,
-                        count,
-                        intensity: level,
-                        color: level === 0 ? '#161b22' : level === 1 ? '#0e4429' : level === 2 ? '#006d32' : level === 3 ? '#26a641' : '#39d353'
-                    });
-                }
-
-                yearSummaries.push({
-                    year: yr.toString(),
-                    total: yearTotal || yearCountSum
-                });
-            }
-
-            return {
-                years: yearSummaries,
-                contributions: allContributions
-            };
-        } catch (err) {
-            return { error: 'Failed to fetch contributions' };
-        }
+    async getGithubContributions(_username: string) {
+        return { years: [], contributions: [] };
     }
 }
