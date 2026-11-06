@@ -226,36 +226,6 @@ export class PortfolioService implements OnModuleInit {
                         { label: 'Fullstack', url: 'https://github.com/ltn23591/Forever' },
                     ],
                 },
-                {
-                    title: 'Portfolio Pro Max — Hệ Thống Portfolio 3D, Admin CMS & WebSockets',
-                    description:
-                        'Hệ thống Portfolio cá nhân tích hợp đồ họa Three.js, hiệu ứng React Bits, cổng quản trị Admin CMS thời gian thực và Backend NestJS + PostgreSQL.',
-                    isBest: false,
-                    highlights: [
-                        'Kiến trúc 3 tầng gồm Portfolio Frontend (React 19, Three.js, React Bits), Admin CMS (Zustand, Recharts) và Backend (NestJS, Prisma ORM, Neon PostgreSQL).',
-                        'Tích hợp Socket.io Gateway theo dõi số lượng khách truy cập trực tiếp và đẩy thông báo tức thì tới Admin khi có thư liên hệ mới.',
-                        'Tối ưu hóa điểm số hiệu năng bundle bằng kỹ thuật tách chunk (Manual Chunks) và quản trị động toàn bộ 8 mục nội dung.',
-                    ],
-                    category: 'fullstack',
-                    tech: [
-                        'NestJS',
-                        'TypeScript',
-                        'PostgreSQL',
-                        'Prisma',
-                        'React 19',
-                        'Three.js',
-                        'Socket.io',
-                    ],
-                    github: 'https://github.com/ltn23591/Portfolio-landing-pages',
-                    live: 'https://github.com/ltn23591/Portfolio-landing-pages',
-                    images: [],
-                    repos: [
-                        {
-                            label: 'Portfolio Repo',
-                            url: 'https://github.com/ltn23591/Portfolio-landing-pages',
-                        },
-                    ],
-                },
             ];
 
             for (const proj of realProjects) {
@@ -297,32 +267,6 @@ export class PortfolioService implements OnModuleInit {
                         'TanStack Table',
                         'RESTful API',
                         'Git Flow',
-                    ],
-                },
-                {
-                    role: 'Lead Developer (Đồ Án Tốt Nghiệp & Đồ Án Môn Học)',
-                    company:
-                        'Hệ Sinh Thái SipPoint (ĐATN) & E-Commerce Fashion Store (Web Nâng Cao)',
-                    period: '2024 - 2026',
-                    achievements: [
-                        'Đồ án Tốt nghiệp: SipPoint F&B 3 phân hệ',
-                        'Web Nâng cao: Fashion Store OTP & JWT',
-                        'Tự động đối soát SePay IPN & PHPMailer',
-                    ],
-                    description: [
-                        '[Đồ Án Tốt Nghiệp]: Thiết kế và phát triển toàn diện Hệ sinh thái SipPoint (SipPoint-BE, SipPoint-Portal, SipPoint-Web-App) với Node.js, Express, MongoDB, Redis và Socket.io thời gian thực, tích hợp SePay IPN Webhook và AI Gemini 2.5 Flash.',
-                        '[Đồ Án Môn Lập Trình Web Nâng Cao]: Xây dựng website E-Commerce Fashion Store bằng PHP MVC & MySQL, triển khai bảo mật JWT, Cookies, Middleware, mã xác thực OTP và gửi email tự động PHPMailer.',
-                        '[Dự Án MERN Forever]: Phát triển hệ thống bán lẻ thời trang với giỏ hàng đa biến thể, quản trị danh mục sản phẩm và lưu trữ đám mây Cloudinary.',
-                    ],
-                    skills: [
-                        'Express.js',
-                        'MongoDB',
-                        'Redis',
-                        'Socket.io',
-                        'React 19',
-                        'SePay Webhook',
-                        'MySQL',
-                        'JWT & OTP',
                     ],
                 },
             ];
